@@ -1,10 +1,11 @@
 import express from "express";
 import dotenv from 'dotenv';
 import arduinoRoutes from './routes/arduino.route.js'
+import pesapalRoutes from './routes/pesapal.route.js'
 import bodyParser from 'body-parser'
 import mqtt from "mqtt"
 import mongoose from "mongoose";
-
+import cors from 'cors'
 const clientId = `mqtt_${Math.random().toString(16).slice(3)}`
 
 const client = mqtt.connect({
@@ -25,7 +26,9 @@ dotenv.config()
 const app = express();
 app.use(bodyParser.json({limit:"30mb",extended:true}))
 app.use(bodyParser.urlencoded({limit:"30mb",extended:true}))
-
+app.use(cors({
+    origin:'*'
+}))
 process.on('uncaughtException',(err)=>{
     console.log(err.message)
     console.log("Unhandled exception occured! shutting down")
@@ -44,6 +47,7 @@ mongoose.connect(process.env.MONGO_CONN_STR,{
 
 
 app.use('/api/arduino',arduinoRoutes)
+app.use('/api/pesapal',pesapalRoutes)
 
 
 
