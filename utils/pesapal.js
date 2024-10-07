@@ -9,7 +9,7 @@ export const authorization = async(req,res,next)=>{
            'Accept':'application/json',
            'Content-Type':'application/json'
        }
-       const apiUrl = 'https://cybqa.pesapal.com/pesapalv3/api/Auth/RequestToken'
+       const apiUrl = 'https://pay.pesapal.com/v3/api/Auth/RequestToken'
        const resp = await axios.post(apiUrl,Request,{headers})
        
        req.pesapalaccesstoken = resp.data.token

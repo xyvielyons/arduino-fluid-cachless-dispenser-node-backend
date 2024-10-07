@@ -1,10 +1,12 @@
 import axios from 'axios'
 import { publishMessage } from '../server.js'
+import UIDGenerator from 'uid-generator';
+const uidgen = new UIDGenerator();
 export const RegisterPesapalIPN = async(req,res,next)=>{
     
         try {
             const pesapaltoken = await req.pesapalaccesstoken
-            const IPNURLREGISTER = 'https://cybqa.pesapal.com/pesapalv3/api/URLSetup/RegisterIPN'
+            const IPNURLREGISTER = 'https://pay.pesapal.com/v3/api/URLSetup/RegisterIPN'
             const headers = {
                 'Accept':'application/json',
                 'Content-Type':'application/json',
@@ -36,7 +38,7 @@ export const pesapalIPN = async(req,res,next)=>{
         try {
             const orderTrackingId = req.body.OrderTrackingId;
             const pesapaltoken = await req.pesapalaccesstoken
-            const IPNURL = `https://cybqa.pesapal.com/pesapalv3/api/Transactions/GetTransactionStatus?orderTrackingId=${orderTrackingId}`
+            const IPNURL = `https://pay.pesapal.com/v3/api/Transactions/GetTransactionStatus?orderTrackingId=${orderTrackingId}`
             const headers = {
                 'Accept':'application/json',
                 'Content-Type':'application/json',
@@ -72,7 +74,7 @@ export const pesapalIPN = async(req,res,next)=>{
 export const getRegisteredIpns = async(req,res,next)=>{
     try {
         const pesapaltoken = await req.pesapalaccesstoken
-        const IPNURL = 'https://cybqa.pesapal.com/pesapalv3/api/URLSetup/GetIpnList'
+        const IPNURL = 'https://pay.pesapal.com/v3/api/URLSetup/GetIpnList'
         const headers = {
             'Accept':'application/json',
             'Content-Type':'application/json',
@@ -95,31 +97,34 @@ export const getRegisteredIpns = async(req,res,next)=>{
 }
 export const InitiatePayment = async(req,res,next)=>{
     try {
+        const uid = await uidgen.generate();
         const pesapaltoken = await req.pesapalaccesstoken
-    const SubmitOrderRequestUrl = 'https://cybqa.pesapal.com/pesapalv3/api/Transactions/SubmitOrderRequest'
+    const SubmitOrderRequestUrl = 'https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest'
     const headers = {
         'Accept':'application/json',
         'Content-Type':'application/json',
         'Authorization':`${pesapaltoken}`
     }
     const requestPaymentObject ={
-        "id": "AA1122-3344ZZ667e47",
+
+        "id": uid,
         "currency": "KES",
-        "amount": 1,
+        "amount": req.body.price,
         "description": "your testing the api you built",
-        "callback_url": "https://www.google.com",
+        "callback_url": "http://127.0.0.1:3000/orderconfirmation",
         "redirect_mode": "",
-        "notification_id": "ebbbfbd0-242a-4c61-8af1-dcb83d26761c",
-        "branch": "Store Name - HQ",
+        "cancellation_url":"http://127.0.0.1:3000/ordercancelled",
+        "notification_id": "eaf3fb8c-00a3-4ab9-8fca-dcac8d7fe326",
+        "branch": "Water vending ATM",
         "billing_address": {
-            "email_address": "john.doe@example.com",
-            "phone_number": "0728440683",
+            "email_address": "myvending@gmail.com",
+            "phone_number": req.body.phoneNumber,
             "country_code": "KE",
-            "first_name": "John",
+            "first_name": req.body.name,
             "middle_name": "",
-            "last_name": "Doe",
-            "line_1": "chege the enginneer 😃",
-            "line_2": "pay",
+            "last_name": "",
+            "line_1": "Water Vending ATM",
+            "line_2": req.body.order,
             "city": "",
             "state": "",
             "postal_code": "",

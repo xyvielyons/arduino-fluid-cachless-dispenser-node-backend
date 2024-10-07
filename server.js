@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from 'dotenv';
 import arduinoRoutes from './routes/arduino.route.js'
 import pesapalRoutes from './routes/pesapal.route.js'
+import organizationRoutes from "./routes/organization.route.js"
 import bodyParser from 'body-parser'
 import mqtt from "mqtt"
 import mongoose from "mongoose";
@@ -48,6 +49,8 @@ mongoose.connect(process.env.MONGO_CONN_STR,{
 
 app.use('/api/arduino',arduinoRoutes)
 app.use('/api/pesapal',pesapalRoutes)
+app.use('/api/arduino/organization',organizationRoutes)
+
 
 
 
